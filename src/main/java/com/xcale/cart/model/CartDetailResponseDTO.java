@@ -1,6 +1,12 @@
 package com.xcale.cart.model;
 
-public class CartDetailDTO {
+
+import java.io.Serializable;
+
+/**
+ * Cart DTO detail class used by create cart item request
+ */
+public class CartDetailResponseDTO implements Serializable {
 
     private Long productId;
 

@@ -1,6 +1,6 @@
 package com.xcale.cart.service;
 
-import com.xcale.cart.entity.Product;
+import com.xcale.cart.model.ProductDTO;
 import com.xcale.cart.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ class ProductServiceTest {
         when(repository.findAll()).thenReturn(Collections.emptyList());
 
         // Act
-        List<Product> productList = service.findAll();
+        List<ProductDTO> productList = service.findAll();
 
         // Assert
         assertNotNull(productList);

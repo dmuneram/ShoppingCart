@@ -1,6 +1,6 @@
 package com.xcale.cart.resource;
 
-import com.xcale.cart.entity.Product;
+import com.xcale.cart.model.ProductDTO;
 import com.xcale.cart.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Product resource controller handles Rest API operations
+ *  - Retrieve all products
+ */
 @RestController
 @RequestMapping("/product")
 public class ProductResource {
@@ -36,8 +40,8 @@ public class ProductResource {
                     description = "Some error occurred while fetching products",
                     content = @Content)})
     @GetMapping
-    public ResponseEntity<List<Product>> fetchCart() {
-        List<Product> list = service.findAll();
+    public ResponseEntity<List<ProductDTO>> fetchAllProducts() {
+        List<ProductDTO> list = service.findAll();
         logger.info("List of products retrieved.");
         return ResponseEntity.ok(list);
     }

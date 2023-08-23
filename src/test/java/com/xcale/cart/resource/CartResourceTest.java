@@ -1,7 +1,7 @@
 package com.xcale.cart.resource;
 
-import com.xcale.cart.entity.Cart;
 import com.xcale.cart.exception.RestExceptionHandler;
+import com.xcale.cart.model.CartResponseDTO;
 import com.xcale.cart.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class CartResourceTest {
 
     @Test
     void fetchCart() throws Exception {
-        when(service.getCartInformation(anyString())).thenReturn(new Cart());
+        when(service.getCartInformation(anyString())).thenReturn(new CartResponseDTO());
         mockMvc.perform(get("/cart/cartId")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))

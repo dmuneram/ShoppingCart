@@ -4,10 +4,12 @@ import com.xcale.cart.entity.Cart;
 import com.xcale.cart.entity.CartDetail;
 import com.xcale.cart.entity.Product;
 import com.xcale.cart.exception.BusinessException;
-import com.xcale.cart.model.CartDTO;
-import com.xcale.cart.model.CartDetailDTO;
+import com.xcale.cart.model.CartRequestDTO;
+import com.xcale.cart.model.CartDetailRequestDTO;
+import com.xcale.cart.model.CartResponseDTO;
 import com.xcale.cart.repository.CartRepository;
 import com.xcale.cart.repository.ProductRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,20 +29,24 @@ public class CartService {
     private final CartRepository repository;
     private final ProductRepository productRepository;
 
-    public CartService(CartRepository repository, ProductRepository productRepository) {
+    private final ModelMapper mapper;
+
+    public CartService(CartRepository repository, ProductRepository productRepository, ModelMapper mapper) {
         this.repository = repository;
         this.productRepository = productRepository;
+        this.mapper = mapper;
     }
 
-    public Cart getCartInformation(String id) {
+    public CartResponseDTO getCartInformation(String id) {
         Cart cart = this.repository.findCartByCartId(id)
                 .orElseThrow(() -> new BusinessException(String.format(CART_NOT_FOUND, id)));
         cart.setLastUsed(LocalDateTime.now());
-        return repository.save(cart);
+        cart = repository.save(cart);
+        return mapper.map(cart, CartResponseDTO.class);
     }
 
     @Transactional
-    public Cart save(CartDTO request) {
+    public CartResponseDTO save(CartRequestDTO request) {
         Cart cart;
         if (request.getId() == null) {
             cart = new Cart();
@@ -51,7 +57,7 @@ public class CartService {
         }
         cart.setCartItems(new HashSet<>());
         BigDecimal cartTotal = BigDecimal.ZERO;
-        for (CartDetailDTO detailDTO : request.getCartItems()) {
+        for (CartDetailRequestDTO detailDTO : request.getCartItems()) {
             Product product = productRepository.findById(detailDTO.getProductId()).orElse(null);
             if (product == null) throw new BusinessException(INVALID_PRODUCT);
             CartDetail detail = new CartDetail();
@@ -65,7 +71,8 @@ public class CartService {
         }
         cart.setCartTotal(cartTotal);
         cart.setLastUsed(LocalDateTime.now());
-        return repository.save(cart);
+        cart = repository.save(cart);
+        return mapper.map(cart, CartResponseDTO.class);
     }
 
     @Transactional
@@ -80,7 +87,7 @@ public class CartService {
         repository.deleteAllByLastUsedBefore(LocalDateTime.now().minusMinutes(10));
     }
 
-    public Cart addDetail(String cartId, CartDetailDTO request) {
+    public CartResponseDTO addDetail(String cartId, CartDetailRequestDTO request) {
         Product product = productRepository.findById(request.getProductId()).orElse(null);
         if (product == null) throw new BusinessException(INVALID_PRODUCT);
 
@@ -114,6 +121,7 @@ public class CartService {
 
         cart.setCartTotal(calculatedTotal);
         cart.setLastUsed(LocalDateTime.now());
-        return repository.save(cart);
+        cart = repository.save(cart);
+        return mapper.map(cart, CartResponseDTO.class);
     }
 }

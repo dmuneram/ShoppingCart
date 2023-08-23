@@ -1,35 +1,25 @@
-package com.xcale.cart.entity;
+package com.xcale.cart.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-
 /**
- * Product entity class, map Product table from DB
+ * Product DTO to show products information
  */
-@Entity
-public class Product implements Serializable {
+public class ProductDTO implements Serializable {
 
-    @Id
-    @GeneratedValue
     private Long id;
 
-    @Column
     private String description;
 
-    @Column
     private BigDecimal price;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {

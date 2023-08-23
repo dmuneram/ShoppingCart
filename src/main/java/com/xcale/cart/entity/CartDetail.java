@@ -14,6 +14,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+
+/**
+ * Cart detail entity class, map Cart Detail table from DB
+ */
 @Entity
 public class CartDetail implements Serializable {
 

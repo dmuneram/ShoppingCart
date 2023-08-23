@@ -4,15 +4,18 @@ import com.xcale.cart.entity.Cart;
 import com.xcale.cart.entity.CartDetail;
 import com.xcale.cart.entity.Product;
 import com.xcale.cart.exception.BusinessException;
-import com.xcale.cart.model.CartDTO;
-import com.xcale.cart.model.CartDetailDTO;
+import com.xcale.cart.model.CartDetailRequestDTO;
+import com.xcale.cart.model.CartRequestDTO;
+import com.xcale.cart.model.CartResponseDTO;
 import com.xcale.cart.repository.CartRepository;
 import com.xcale.cart.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -40,6 +43,9 @@ class CartServiceTest {
     @InjectMocks
     private CartService service;
 
+    @Spy
+    ModelMapper modelMapper = new ModelMapper();
+
     private final Cart entity = new Cart();
 
     @Test
@@ -50,7 +56,7 @@ class CartServiceTest {
         String cartId = UUID.randomUUID().toString();
 
         // Act
-        Cart cartInformation = service.getCartInformation(cartId);
+        CartResponseDTO cartInformation = service.getCartInformation(cartId);
 
         // Assert
         assertNotNull(cartInformation);
@@ -73,16 +79,16 @@ class CartServiceTest {
         product.setPrice(BigDecimal.ONE);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
         when(repository.save(any())).thenReturn(entity);
-        CartDTO cartDTO = new CartDTO();
-        Set<CartDetailDTO> items = new HashSet<>();
-        CartDetailDTO dtoDetail = new CartDetailDTO();
+        CartRequestDTO cartRequestDTO = new CartRequestDTO();
+        Set<CartDetailRequestDTO> items = new HashSet<>();
+        CartDetailRequestDTO dtoDetail = new CartDetailRequestDTO();
         dtoDetail.setProductId(1L);
         dtoDetail.setQuantity(1);
         items.add(dtoDetail);
-        cartDTO.setCartItems(items);
+        cartRequestDTO.setCartItems(items);
 
         // Act
-        Cart saved = service.save(cartDTO);
+        CartResponseDTO saved = service.save(cartRequestDTO);
 
         // Assert
         assertNotNull(saved);
@@ -91,16 +97,16 @@ class CartServiceTest {
     @Test
     void save_invalidProduct() {
         // Arrange
-        CartDTO cartDTO = new CartDTO();
-        Set<CartDetailDTO> items = new HashSet<>();
-        CartDetailDTO dtoDetail = new CartDetailDTO();
+        CartRequestDTO cartRequestDTO = new CartRequestDTO();
+        Set<CartDetailRequestDTO> items = new HashSet<>();
+        CartDetailRequestDTO dtoDetail = new CartDetailRequestDTO();
         dtoDetail.setProductId(1L);
         dtoDetail.setQuantity(1);
         items.add(dtoDetail);
-        cartDTO.setCartItems(items);
+        cartRequestDTO.setCartItems(items);
 
         // Act & Assert
-        assertThrows(BusinessException.class, () -> service.save(cartDTO));
+        assertThrows(BusinessException.class, () -> service.save(cartRequestDTO));
 
     }
 
@@ -111,12 +117,12 @@ class CartServiceTest {
         entity.setCartId(id);
         when(repository.findCartByCartId(anyString())).thenReturn(Optional.of(entity));
         when(repository.save(any())).thenReturn(entity);
-        CartDTO cartDTO = new CartDTO();
-        cartDTO.setId(id);
-        cartDTO.setCartItems(new HashSet<>());
+        CartRequestDTO cartRequestDTO = new CartRequestDTO();
+        cartRequestDTO.setId(id);
+        cartRequestDTO.setCartItems(new HashSet<>());
 
         // Act
-        Cart saved = service.save(cartDTO);
+        CartResponseDTO saved = service.save(cartRequestDTO);
 
         // Assert
         assertNotNull(saved);
@@ -126,12 +132,12 @@ class CartServiceTest {
     void save_existingCart_notFound() {
         // Arrange
         String id = UUID.randomUUID().toString();
-        CartDTO cartDTO = new CartDTO();
-        cartDTO.setId(id);
-        cartDTO.setCartItems(new HashSet<>());
+        CartRequestDTO cartRequestDTO = new CartRequestDTO();
+        cartRequestDTO.setId(id);
+        cartRequestDTO.setCartItems(new HashSet<>());
 
         // Act & Assert
-        assertThrows(BusinessException.class, () -> service.save(cartDTO));
+        assertThrows(BusinessException.class, () -> service.save(cartRequestDTO));
 
     }
 
@@ -166,7 +172,7 @@ class CartServiceTest {
     void addDetail_successfully() {
         // Arrange
         String cartId = UUID.randomUUID().toString();
-        CartDetailDTO request = new CartDetailDTO();
+        CartDetailRequestDTO request = new CartDetailRequestDTO();
         request.setQuantity(1);
         request.setProductId(1L);
         entity.setCartItems(new HashSet<>());
@@ -177,7 +183,7 @@ class CartServiceTest {
         when(repository.save(any())).thenReturn(entity);
 
         // Act
-        Cart saved = service.addDetail(cartId, request);
+        CartResponseDTO saved = service.addDetail(cartId, request);
 
         // Assert
         assertNotNull(saved);
@@ -187,7 +193,7 @@ class CartServiceTest {
     void addDetail_successfully_existing_item() {
         // Arrange
         String cartId = UUID.randomUUID().toString();
-        CartDetailDTO request = new CartDetailDTO();
+        CartDetailRequestDTO request = new CartDetailRequestDTO();
         request.setQuantity(1);
         request.setProductId(1L);
         Set<CartDetail> items = new HashSet<>();
@@ -203,7 +209,7 @@ class CartServiceTest {
         when(repository.save(any())).thenReturn(entity);
 
         // Act
-        Cart saved = service.addDetail(cartId, request);
+        CartResponseDTO saved = service.addDetail(cartId, request);
 
         // Assert
         assertNotNull(saved);
@@ -213,7 +219,7 @@ class CartServiceTest {
     void addDetail_invalidProduct() {
         // Arrange
         String cartId = UUID.randomUUID().toString();
-        CartDetailDTO request = new CartDetailDTO();
+        CartDetailRequestDTO request = new CartDetailRequestDTO();
         request.setQuantity(1);
         request.setProductId(null);
 
@@ -226,7 +232,7 @@ class CartServiceTest {
     void addDetail_cartNotFound() {
         // Arrange
         String cartId = UUID.randomUUID().toString();
-        CartDetailDTO request = new CartDetailDTO();
+        CartDetailRequestDTO request = new CartDetailRequestDTO();
         request.setQuantity(1);
         request.setProductId(1L);
         Product product = new Product();

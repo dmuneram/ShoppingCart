@@ -1,9 +1,9 @@
 package com.xcale.cart.resource;
 
-import com.xcale.cart.entity.Cart;
 import com.xcale.cart.exception.BusinessException;
-import com.xcale.cart.model.CartDTO;
-import com.xcale.cart.model.CartDetailDTO;
+import com.xcale.cart.model.CartDetailRequestDTO;
+import com.xcale.cart.model.CartRequestDTO;
+import com.xcale.cart.model.CartResponseDTO;
 import com.xcale.cart.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +20,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+/**
+ * Cart resource controller handles Rest API operations
+ * - fetch cart
+ * - create new cart
+ * - add new item to an existing cart
+ * - delete cart using respective identifier
+ */
 @RestController
 @RequestMapping("/cart")
 public class CartResource {
@@ -41,8 +49,8 @@ public class CartResource {
                     description = "Some error occurred while fetching cart",
                     content = @Content)})
     @GetMapping(value = "/{cartId}")
-    public ResponseEntity<Cart> fetchCart(@PathVariable String cartId) {
-        Cart entity = service.getCartInformation(cartId);
+    public ResponseEntity<CartResponseDTO> fetchCart(@PathVariable String cartId) {
+        CartResponseDTO entity = service.getCartInformation(cartId);
         logger.info("Cart retrieved!");
         return ResponseEntity.ok(entity);
     }
@@ -74,13 +82,13 @@ public class CartResource {
                     description = "Some error occurred while saving cart item",
                     content = @Content)})
     @PostMapping(value = "/{cartId}")
-    public ResponseEntity<Cart> saveItemToCart(@PathVariable String cartId, @RequestBody CartDetailDTO request) {
+    public ResponseEntity<CartResponseDTO> saveItemToCart(@PathVariable String cartId, @RequestBody CartDetailRequestDTO request) {
 
         if (request.getProductId() == null || request.getProductId() < 1)
             throw new BusinessException("Product Id is mandatory");
         if (request.getQuantity() < 1)
             throw new BusinessException("Quantity is mandatory and value must be greater than 0");
-        Cart cart = service.addDetail(cartId, request);
+        CartResponseDTO cart = service.addDetail(cartId, request);
 
         logger.info("Cart saved");
 
@@ -96,16 +104,16 @@ public class CartResource {
                     description = "Some error occurred while saving cart",
                     content = @Content)})
     @PostMapping
-    public ResponseEntity<Cart> saveCart(@RequestBody CartDTO request) {
+    public ResponseEntity<CartResponseDTO> saveCart(@RequestBody CartRequestDTO request) {
         validateCart(request);
-        Cart cart = service.save(request);
+        CartResponseDTO cart = service.save(request);
 
         logger.info("Cart saved");
 
         return ResponseEntity.ok(cart);
     }
 
-    private void validateCart(CartDTO request) {
+    private void validateCart(CartRequestDTO request) {
         if (request.getCartItems() == null) throw new BusinessException("Error creating cart, items were empty.");
         boolean invalid = request.getCartItems()
                 .stream()

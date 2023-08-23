@@ -25,8 +25,8 @@ These services can perform below operations, also this information can be found 
   "id": "string",
   "cartItems": [
     {
-      "productId": 0,
-      "quantity": 0
+      "productId": 2,
+      "quantity": 5
     }
   ]
 }'
@@ -60,6 +60,151 @@ curl -X 'GET' \
   'http://localhost:8080/product' \
   -H 'accept: */*'
 ```
+### Request and Response samples
+- Create new cart with items POST
+#### Request
+```
+POST /cart
+{
+  "cartItems": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ]
+}
+```
+#### Response
+```
+{
+  "id": "32843a8b-0686-4a03-9ea0-d4c86330631b",
+  "cartTotal": 199.98,
+  "cartItems": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ]
+}
+```
+- Add item to existing Cart
+#### Request
+```
+POST /cart/32843a8b-0686-4a03-9ea0-d4c86330631b
+{
+  "productId": 2,
+  "quantity": 5
+}
+```
+#### Response
+```
+{
+  "id": "32843a8b-0686-4a03-9ea0-d4c86330631b",
+  "cartTotal": 454.48,
+  "cartItems": [
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 2,
+      "quantity": 5
+    }
+  ]
+}
+```
+- Retrieve Cart information
+#### Request
+```
+GET /cart/32843a8b-0686-4a03-9ea0-d4c86330631b
+```
+#### Response
+```
+{
+  "id": "32843a8b-0686-4a03-9ea0-d4c86330631b",
+  "cartTotal": 454.48,
+  "cartItems": [
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 2,
+      "quantity": 5
+    }
+  ]
+}
+```
+- Delete Cart
+#### Request
+```
+DELETE /cart/32843a8b-0686-4a03-9ea0-d4c86330631b
+```
+#### Response
+```
+HTTP Status 204 No content
+```
+- Retrieve all generated Products
+#### Request
+```
+GET /product
+```
+#### Response
+```
+[
+  {
+    "id": 1,
+    "description": "Java Book 1",
+    "price": 99.99
+  },
+  {
+    "id": 2,
+    "description": "Spring boot book",
+    "price": 50.9
+  },
+  {
+    "id": 3,
+    "description": "Java Book 2",
+    "price": 120.1
+  },
+  {
+    "id": 4,
+    "description": "Clean Code Book",
+    "price": 110.8
+  },
+  {
+    "id": 5,
+    "description": "Java Programming",
+    "price": 115.5
+  },
+  {
+    "id": 6,
+    "description": "Java Book 3",
+    "price": 79.99
+  },
+  {
+    "id": 7,
+    "description": "Spring boot book 2",
+    "price": 67.9
+  },
+  {
+    "id": 8,
+    "description": "Java Book 4",
+    "price": 126.1
+  },
+  {
+    "id": 9,
+    "description": "Clean Code Book 2",
+    "price": 133.8
+  },
+  {
+    "id": 10,
+    "description": "Java Programming 2",
+    "price": 105.5
+  }
+]
+```
+
 ### Project setup
 
 This project use Maven 3 to handle dependencies and to build a runnable jar
@@ -85,6 +230,12 @@ no password
 You need to execute the application in order to open swagger link:
 [swagger](http://localhost:8080/swagger-ui.html)
 
+### Test results
+You can execute tests
+```
+mvn clean test
+```
+![tests results screenshot.PNG](img/tests%20results%20screenshot.PNG)
 ### Code coverage
 JaCoCo plugin is used to check code coverage, you can execute:
 ```
@@ -92,6 +243,7 @@ mvn clean install
 ```
 After that you can check code coverage report on:
 *target/site/jacoco/index.html*
+![jacoco code coverage.PNG](img/jacoco%20code%20coverage.PNG)
 
 ### Spring Boot Reference Documentation
 

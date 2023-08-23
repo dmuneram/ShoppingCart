@@ -1,12 +1,18 @@
 package com.xcale.cart.model;
 
+import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 import java.util.Set;
 
-public class CartDTO {
+/**
+ * Cart DTO class used by create cart request
+ */
+public class CartRequestDTO implements Serializable {
 
     private String id;
 
-    private Set<CartDetailDTO> cartItems;
+    @NotEmpty
+    private Set<CartDetailRequestDTO> cartItems;
 
     public String getId() {
         return id;
@@ -16,11 +22,11 @@ public class CartDTO {
         this.id = id;
     }
 
-    public Set<CartDetailDTO> getCartItems() {
+    public Set<CartDetailRequestDTO> getCartItems() {
         return cartItems;
     }
 
-    public void setCartItems(Set<CartDetailDTO> cartItems) {
+    public void setCartItems(Set<CartDetailRequestDTO> cartItems) {
         this.cartItems = cartItems;
     }
 

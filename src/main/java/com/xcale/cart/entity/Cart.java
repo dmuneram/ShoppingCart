@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * Cart entity class, map Cart table from DB
+ */
 @Entity
 public class Cart implements Serializable {
 
